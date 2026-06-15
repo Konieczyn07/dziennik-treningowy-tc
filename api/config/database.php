@@ -11,7 +11,8 @@ class Database {
 			$conn = sqlsrv_connect($serverName, $connectionInfo);
 
 			return $conn;
-		}catch{
+		}catch(error){
+		
 			$this->username = "rootadmin";
 			$this->password = "=fX^anHD~W4a2#.D3ZP1";
 
