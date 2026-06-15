@@ -1,6 +1,25 @@
 <?php
-$allowedOrigin = getenv('CORS_ALLOWED_ORIGIN') ?: '*';
-header("Access-Control-Allow-Origin: " . $allowedOrigin);
+session_start();
+
+$public_endpoints = ['/zaliczenie/api/auth/login', '/zaliczenie/api/auth/register', '/zaliczenie/api/auth/check'];
+$request_uri = $_SERVER['REQUEST_URI'];
+
+$is_public = false;
+foreach($public_endpoints as $endpoint) {
+    if(strpos($request_uri, $endpoint) !== false) {
+        $is_public = true;
+        break;
+    }
+}
+
+if(!$is_public && !isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(["error" => "Unauthorized", "message" => "Musisz być zalogowany"]);
+    exit();
+}
+
+
+header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Max-Age: 3600");
@@ -16,7 +35,7 @@ include_once 'models/workout.php';
 include_once 'controllers/workoutController.php';
 
 $database = new Database();
-$db = $database->getConnection();
+$db = $database->getConn();
 $controller = new WorkoutController($db);
 
 $method = $_SERVER['REQUEST_METHOD'];

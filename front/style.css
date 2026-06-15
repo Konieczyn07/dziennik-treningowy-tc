@@ -113,3 +113,112 @@
 		.delete-btn:hover {
             background: #f56565a3;
         }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Auth */
+        .auth-section {
+            max-width: 420px;
+            margin: 0 auto 30px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .auth-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .auth-panel h2 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .auth-panel form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .auth-message {
+            margin-top: 15px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .auth-message.success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .auth-message.error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        /* User bar */
+        .user-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 25px;
+        }
+
+        #user-greeting {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .logout-btn {
+            background: #718096;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #4a5568;
+        }
+
+        .cancel-btn {
+            background: #718096;
+            display: none;
+        }
+
+        .cancel-btn:hover {
+            background: #4a5568;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #718096;
+            padding: 30px;
+        }

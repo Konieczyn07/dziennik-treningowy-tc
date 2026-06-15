@@ -1,50 +1,158 @@
-const API_URL = window.API_BASE_URL || '/api/index.php';
+const API_URL = 'http://localhost/zaliczenie/api/index.php';
+const AUTH_URL = 'http://localhost/zaliczenie/api/auth';
+
+const fetchOptions = { credentials: 'include' };
 
 let isEditing = false;
+let currentUser = null;
+
+// --- Auth ---
+
+async function checkAuth() {
+    try {
+        const response = await fetch(`${AUTH_URL}/check.php`, fetchOptions);
+        const data = await response.json();
+
+        if (data.logged_in) {
+            currentUser = data.user;
+            showApp();
+            return true;
+        }
+
+        showAuth();
+        return false;
+    } catch (error) {
+        console.error('Błąd sprawdzania sesji:', error);
+        showAuth();
+        return false;
+    }
+}
+
+async function login(username, password) {
+    const response = await fetch(`${AUTH_URL}/login.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username, password })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+        currentUser = data.user;
+        showAuthMessage(data.message, 'success');
+        showApp();
+        fetchWorkouts();
+    } else {
+        showAuthMessage(data.message, 'error');
+    }
+}
+
+async function register(username, email, password) {
+    const response = await fetch(`${AUTH_URL}/register.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username, email, password })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+        showAuthMessage(data.message, 'success');
+        switchAuthTab('login');
+        document.getElementById('login-username').value = username;
+    } else {
+        showAuthMessage(data.message, 'error');
+    }
+}
+
+async function logout() {
+    try {
+        await fetch(`${AUTH_URL}/logout.php`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+    } catch (error) {
+        console.error('Błąd wylogowania:', error);
+    }
+
+    currentUser = null;
+    showAuth();
+}
+
+function showApp() {
+    document.getElementById('auth-section').classList.add('hidden');
+    document.getElementById('app-section').classList.remove('hidden');
+    document.getElementById('user-greeting').textContent = `Witaj, ${currentUser.username}!`;
+}
+
+function showAuth() {
+    document.getElementById('auth-section').classList.remove('hidden');
+    document.getElementById('app-section').classList.add('hidden');
+    document.getElementById('workouts-container').innerHTML = '';
+    resetForm();
+}
+
+function showAuthMessage(message, type) {
+    const el = document.getElementById('auth-message');
+    el.textContent = message;
+    el.className = `auth-message ${type}`;
+}
+
+function switchAuthTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
+    document.getElementById('login-panel').classList.toggle('hidden', tab !== 'login');
+    document.getElementById('register-panel').classList.toggle('hidden', tab !== 'register');
+    document.getElementById('auth-message').textContent = '';
+    document.getElementById('auth-message').className = 'auth-message';
+}
+
+// --- Workouts ---
 
 async function fetchWorkouts() {
-    console.log('Pobieram dane z:', API_URL);
-    
     try {
-        const response = await fetch(API_URL);
-        
-        console.log('Status odpowiedzi:', response.status);
-        console.log('Content-Type:', response.headers.get('content-type'));
-        
+        const response = await fetch(API_URL, fetchOptions);
+
+        if (response.status === 401) {
+            showAuth();
+            showAuthMessage('Sesja wygasła. Zaloguj się ponownie.', 'error');
+            return;
+        }
+
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
-            const text = await response.text();
-            console.error('Odpowiedź nie jest JSON. Pierwsze 100 znaków:', text.substring(0, 100));
-            throw new Error('API nie zwróciło JSON. Sprawdź ścieżkę!');
+            throw new Error('API nie zwróciło JSON');
         }
-        
+
         const workouts = await response.json();
-        console.log('Otrzymane dane:', workouts);
-        
+
         if (Array.isArray(workouts)) {
             displayWorkouts(workouts);
+        } else if (workouts.error) {
+            document.getElementById('workouts-container').innerHTML =
+                `<div class="empty-message">${escapeHtml(workouts.message)}</div>`;
         } else {
-            console.error('API nie zwróciło tablicy:', workouts);
-            document.getElementById('workouts-container').innerHTML = 
+            document.getElementById('workouts-container').innerHTML =
                 '<div class="empty-message">Błąd: API nie zwróciło danych</div>';
         }
     } catch (error) {
         console.error('Błąd pobierania:', error);
-        document.getElementById('workouts-container').innerHTML = 
-            '<div class="empty-message">Błąd połączenia z API.<br>' + 
-            'Sprawdź czy ścieżka jest poprawna:<br>' +
-            '<code>' + API_URL + '</code></div>';
+        document.getElementById('workouts-container').innerHTML =
+            '<div class="empty-message">Błąd połączenia z API.</div>';
     }
 }
 
 function displayWorkouts(workouts) {
     const container = document.getElementById('workouts-container');
-    
+
     if (!workouts || workouts.length === 0) {
         container.innerHTML = '<div class="empty-message">Brak treningów. Dodaj pierwszy!</div>';
         return;
     }
-    
+
     container.innerHTML = workouts.map(workout => `
         <div class="workout-card" data-id="${workout.id}">
             <h3>${escapeHtml(workout.exercise_name)}</h3>
@@ -63,20 +171,22 @@ function displayWorkouts(workouts) {
 }
 
 async function addWorkout(workoutData) {
-    console.log('Dodaję trening:', workoutData);
-    
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(workoutData)
         });
-        
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error('API zwróciło błąd serwera: ' + text.substring(0, 200));
+        }
+
         const result = await response.json();
-        console.log('Odpowiedź API:', result);
-        
+
         if (result.message) {
             alert(result.message);
             fetchWorkouts();
@@ -91,20 +201,16 @@ async function addWorkout(workoutData) {
 }
 
 async function updateWorkout(id, workoutData) {
-    console.log('Aktualizuję trening ID:', id, workoutData);
-    
     try {
         const response = await fetch(API_URL, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ id, ...workoutData })
         });
-        
+
         const result = await response.json();
-        console.log('Odpowiedź API:', result);
-        
+
         if (result.message) {
             alert(result.message);
             fetchWorkouts();
@@ -120,17 +226,15 @@ async function updateWorkout(id, workoutData) {
 
 async function deleteWorkout(id) {
     if (!confirm('Czy na pewno chcesz usunąć ten trening?')) return;
-    
-    console.log('Usuwam trening ID:', id);
-    
+
     try {
         const response = await fetch(`${API_URL}?id=${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            credentials: 'include'
         });
-        
+
         const result = await response.json();
-        console.log('Odpowiedź API:', result);
-        
+
         if (result.message) {
             alert(result.message);
             fetchWorkouts();
@@ -144,28 +248,26 @@ async function deleteWorkout(id) {
 }
 
 async function editWorkout(id) {
-    console.log('Edycja treningu ID:', id);
-    
     try {
-        const response = await fetch(`${API_URL}?id=${id}`);
+        const response = await fetch(`${API_URL}?id=${id}`, fetchOptions);
         const workout = await response.json();
-        
+
         if (!workout || !workout.id) {
             alert('Nie znaleziono treningu');
             return;
         }
-        
+
         document.getElementById('workout-id').value = workout.id;
         document.getElementById('exercise-name').value = workout.exercise_name;
         document.getElementById('sets').value = workout.sets;
         document.getElementById('reps').value = workout.reps;
         document.getElementById('weight').value = workout.weight;
         document.getElementById('workout-date').value = workout.workout_date;
-        
+
         document.getElementById('form-title').textContent = 'Edytuj trening';
         document.getElementById('submit-btn').textContent = 'Zapisz zmiany';
         document.getElementById('cancel-btn').style.display = 'inline-block';
-        
+
         isEditing = true;
     } catch (error) {
         console.error('Błąd pobierania treningu do edycji:', error);
@@ -178,6 +280,7 @@ function resetForm() {
     document.getElementById('workout-id').value = '';
     document.getElementById('form-title').textContent = 'Dodaj trening';
     document.getElementById('submit-btn').textContent = 'Dodaj';
+    document.getElementById('cancel-btn').style.display = 'none';
     isEditing = false;
 }
 
@@ -191,9 +294,32 @@ function escapeHtml(str) {
         .replace(/'/g, '&#39;');
 }
 
+// --- Event listeners ---
+
+document.querySelectorAll('.auth-tab').forEach(btn => {
+    btn.addEventListener('click', () => switchAuthTab(btn.dataset.tab));
+});
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+    await login(username, password);
+});
+
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('register-username').value.trim();
+    const email = document.getElementById('register-email').value.trim();
+    const password = document.getElementById('register-password').value;
+    await register(username, email, password);
+});
+
+document.getElementById('logout-btn').addEventListener('click', logout);
+
 document.getElementById('workout-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const workoutData = {
         exercise_name: document.getElementById('exercise-name').value,
         sets: parseInt(document.getElementById('sets').value),
@@ -201,14 +327,14 @@ document.getElementById('workout-form').addEventListener('submit', async (e) => 
         weight: parseFloat(document.getElementById('weight').value) || 0,
         workout_date: document.getElementById('workout-date').value
     };
-    
+
     if (!workoutData.exercise_name || !workoutData.sets || !workoutData.reps || !workoutData.workout_date) {
         alert('Wypełnij wszystkie wymagane pola!');
         return;
     }
-    
+
     const id = document.getElementById('workout-id').value;
-    
+
     if (isEditing && id) {
         await updateWorkout(id, workoutData);
     } else {
@@ -218,8 +344,9 @@ document.getElementById('workout-form').addEventListener('submit', async (e) => 
 
 document.getElementById('cancel-btn').addEventListener('click', resetForm);
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Strona załadowana, pobieram dane...');
-    console.log('API_URL =', API_URL);
-    fetchWorkouts();
+document.addEventListener('DOMContentLoaded', async () => {
+    const loggedIn = await checkAuth();
+    if (loggedIn) {
+        fetchWorkouts();
+    }
 });

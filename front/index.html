@@ -10,25 +10,62 @@
 <body>
 	<div class="container">
 		<h1>Dziennik Treningowy</h1>
-		<div class="form-container">
-			<h2 id="form-title">Dodaj Trening</h2>
-			<form id="workout-form">
-				<input type="hidden" id="workout-id">
-				<input type="text" id="exercise-name" placeholder="Nazwa ćwiczenia" required>
-				<input type="number" id="sets" placeholder="Ilość serii" required>
-				<input type="number" id="reps" placeholder="Ilość powtórzeń" required>
-				<input type="number" id="weight" step="0.01" placeholder="Ciężar (kg)">
-				<input type="date" id="workout-date" required>
-				<button type="submit" id="submit-btn">Dodaj</button>
-				<button type="button" id="cancel-btn" class="cancel-btn">Anuluj</button>
-			</form>
+
+		<!-- Auth section (visible when logged out) -->
+		<div id="auth-section" class="auth-section">
+			<div class="auth-tabs">
+				<button type="button" class="auth-tab active" data-tab="login">Logowanie</button>
+				<button type="button" class="auth-tab" data-tab="register">Rejestracja</button>
+			</div>
+
+			<div id="login-panel" class="auth-panel">
+				<h2>Zaloguj się</h2>
+				<form id="login-form">
+					<input type="text" id="login-username" placeholder="Nazwa użytkownika lub email" required>
+					<input type="password" id="login-password" placeholder="Hasło" required>
+					<button type="submit">Zaloguj</button>
+				</form>
+			</div>
+
+			<div id="register-panel" class="auth-panel hidden">
+				<h2>Utwórz konto</h2>
+				<form id="register-form">
+					<input type="text" id="register-username" placeholder="Nazwa użytkownika" required>
+					<input type="email" id="register-email" placeholder="Email" required>
+					<input type="password" id="register-password" placeholder="Hasło (min. 4 znaki)" required minlength="4">
+					<button type="submit">Zarejestruj</button>
+				</form>
+			</div>
+
+			<div id="auth-message" class="auth-message"></div>
 		</div>
-		<div class="workout-list">
-			<h2>Historia treningów</h2>
-			<div id="workouts-container"></div>
+
+		<!-- Main app (visible when logged in) -->
+		<div id="app-section" class="hidden">
+			<div class="user-bar">
+				<span id="user-greeting"></span>
+				<button type="button" id="logout-btn" class="logout-btn">Wyloguj</button>
+			</div>
+
+			<div class="form-container">
+				<h2 id="form-title">Dodaj Trening</h2>
+				<form id="workout-form">
+					<input type="hidden" id="workout-id">
+					<input type="text" id="exercise-name" placeholder="Nazwa ćwiczenia" required>
+					<input type="number" id="sets" placeholder="Ilość serii" required>
+					<input type="number" id="reps" placeholder="Ilość powtórzeń" required>
+					<input type="number" id="weight" step="0.01" placeholder="Ciężar (kg)">
+					<input type="date" id="workout-date" required>
+					<button type="submit" id="submit-btn">Dodaj</button>
+					<button type="button" id="cancel-btn" class="cancel-btn">Anuluj</button>
+				</form>
+			</div>
+			<div class="workout-list">
+				<h2>Historia treningów</h2>
+				<div id="workouts-container"></div>
+			</div>
 		</div>
 	</div>
-	<script src="config.js"></script>
 	<script src="app.js"></script>
 </body>
 </html>

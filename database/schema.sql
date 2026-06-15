@@ -1,13 +1,23 @@
-CREATE TABLE IF NOT EXISTS workouts (
-    id SERIAL PRIMARY KEY,
-    exercise_name VARCHAR(100) NOT NULL,
-    sets INTEGER NOT NULL CHECK (sets > 0),
-    reps INTEGER NOT NULL CHECK (reps > 0),
-    weight DECIMAL(5,2) DEFAULT 0.00,
-    workout_date DATE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE DATABASE IF NOT EXISTS training_journal;
+USE training_journal;
+
+CREATE TABLE users(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	username VARCHAR(50) NOT NULL UNIQUE,
+	email VARCHAR(100) NOT NULL UNIQUE,
+	password VARCHAR(255) NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_workouts_date ON workouts(workout_date);
+CREATE TABLE workouts(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	user_id INT NOT NULL,
+	exercise_name VARCHAR(100) NOT NULL,
+	sets INT NOT NULL,
+	reps INT NOT NULL,
+	weight DECIMAL(5,2),
+	workout_date DATE NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
-COMMENT ON TABLE workouts IS 'Tabela przechowująca historię treningów użytkownika';
