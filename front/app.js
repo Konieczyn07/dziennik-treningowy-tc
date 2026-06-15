@@ -7,25 +7,6 @@ const fetchOptions = { credentials: 'include' };
 let isEditing = false;
 let currentUser = null;
 
-async function checkAuth() {
-    try {
-        const response = await fetch(`${AUTH_URL}/check.php`, fetchOptions);
-        const data = await response.json();
-
-        if (data.logged_in) {
-            currentUser = data.user;
-            showApp();
-            return true;
-        }
-
-        showAuth();
-        return false;
-    } catch (error) {
-        console.error('Błąd sprawdzania sesji:', error);
-        showAuth();
-        return false;
-    }
-}
 
 async function login(username, password) {
     const response = await fetch(`${AUTH_URL}/login.php`, {
