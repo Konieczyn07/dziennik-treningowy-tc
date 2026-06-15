@@ -1,8 +1,8 @@
 <?php
 
 class Database {
-	public $username = getenv("DATABASE_USERNAME");
-	public $password = getenv("DATABASE_PASSWORD");
+	public $username = getenv('DATABASE_USERNAME');
+	public $password = getenv('DATABASE_PASSWORD');
 	
 	public function getConn() {
 		
