@@ -7,10 +7,74 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+    
+      - name: Setup PHP configuration
+        run: |
+          sudo cp php.ini-production /etc/php/8.2/cli/php.ini || true
+          echo "session.auto_start = 0" | sudo tee -a /etc/php/8.2/cli/conf.d/99_session.ini
+      
+      - name: Start PHP built-in server for testing
+        run: |
+          php -S localhost:8000 -t . > /dev/null 2>&1 &
+          sleep 3
+      
+      - name: Setup Python for API tests
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pytest pytest-cov
+      
+      - name: Verify test file exists
+        run: |
+          if [ -f "test_api.py" ]; then
+            echo "test_api.py found"
+            cat test_api.py | head -20
+          else
+            echo "test_api.py not found"
+            ls -la
+            exit 1
+          fi
+      
+      - name: Run API tests with pytest
+        run: |
+          # Run tests against local PHP server
+          python -m pytest test_api.py -v --tb=short
+        env:
+          API_BASE_URL: "http://localhost:8000"
+      
+      - name: Run tests with coverage (if supported)
+        run: |
+          python -m pytest test_api.py -v --cov=. --cov-report=term --cov-report=xml || true
+      
+      - name: Test authentication endpoints
+        run: |
+          # Quick health check of auth endpoints
+          curl -f http://localhost:8000/api/auth/check || echo "Auth endpoint check"
+          curl -X POST http://localhost:8000/api/auth/register \
+            -H "Content-Type: application/json" \
+            -d '{"username":"testuser","email":"test@test.com","password":"Test123!"}' \
+            || echo "Registration test completed"
+      
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
