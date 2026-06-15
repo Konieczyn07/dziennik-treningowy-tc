@@ -61,7 +61,9 @@ jobs:
     permissions:
       contents: read
     needs: test
-
+    env: 
+      API_URL: ${{ secrets.API_URL }}
+      AUTH_URL: ${{ secrets.AUTH_URL }}      
     steps:
       - uses: actions/checkout@v4
 
