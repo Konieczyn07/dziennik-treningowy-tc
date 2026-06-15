@@ -1,4 +1,4 @@
 <?php
-header("Location: /front/index.php");
+header("Location: /front/index.html");
 exit();
 ?>
