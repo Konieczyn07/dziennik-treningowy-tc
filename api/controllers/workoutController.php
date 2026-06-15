@@ -60,7 +60,7 @@ class WorkoutController{
         
         $this->workout->user_id = $this->getUserId();
         if(!$this->workout->user_id){
-            echo echo json_encode(["message" => "Brak zalogowanego użytkownika"]);
+            echo json_encode(["message" => "Brak zalogowanego użytkownika"]);
             return;
         }
         $this->workout->exercise_name = htmlspecialchars(strip_tags($data['exercise_name']));
