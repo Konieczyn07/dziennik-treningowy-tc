@@ -63,7 +63,7 @@ class User {
         $params = array($this->username, $this->email);
         $stmt = sqlsrv_query($this->conn, $query, $params);
         
-        return $stmt->rowCount() > 0;
+        return $stmt;
     }
 }
 ?>
