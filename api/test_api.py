@@ -34,9 +34,9 @@ class TestPublicEndpoints:
     def test_register_endpoint_is_public(self):
         """Test that /auth/register can be accessed without being logged in"""
         public_endpoints_configured = [
-            '/zaliczenie/api/auth/login',
-            '/zaliczenie/api/auth/register',
-            '/zaliczenie/api/auth/check'
+            '/zaliczenie/api/login',
+            '/zaliczenie/api/register',
+            '/zaliczenie/api/check'
         ]
         
         assert any('/register' in endpoint for endpoint in public_endpoints_configured)
@@ -44,9 +44,9 @@ class TestPublicEndpoints:
     def test_check_endpoint_is_public(self):
         """Test that /auth/check can be accessed without being logged in"""
         public_endpoints_configured = [
-            '/zaliczenie/api/auth/login',
-            '/zaliczenie/api/auth/register',
-            '/zaliczenie/api/auth/check'
+            '/zaliczenie/api/login',
+            '/zaliczenie/api/register',
+            '/zaliczenie/api/check'
         ]
         
         assert any('/check' in endpoint for endpoint in public_endpoints_configured)

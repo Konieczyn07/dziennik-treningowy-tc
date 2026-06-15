@@ -7,8 +7,6 @@ const fetchOptions = { credentials: 'include' };
 let isEditing = false;
 let currentUser = null;
 
-// --- Auth ---
-
 async function checkAuth() {
     try {
         const response = await fetch(`${AUTH_URL}/check.php`, fetchOptions);
