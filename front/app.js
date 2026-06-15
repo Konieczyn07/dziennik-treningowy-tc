@@ -1,5 +1,6 @@
-const API_URL = process.env.API_URL;
-const AUTH_URL = process.env.AUTH_URL;
+const root = document.location.origin;
+const API_URL = root+"/api/index.php";
+const AUTH_URL = root+"/api/auth";
 
 const fetchOptions = { credentials: 'include' };
 
