@@ -20,9 +20,9 @@ class TestPublicEndpoints:
         # Check that the endpoint doesn't require authentication
         # This is a structural test - verifying the endpoint exists in public list
         public_endpoints_configured = [
-            '/zaliczenie/api/auth/login',
-            '/zaliczenie/api/auth/register', 
-            '/zaliczenie/api/auth/check'
+            '/dziennik_treningowy/api/login',
+            '/dziennik_treningowy/api/register', 
+            '/dziennik_treningowy/api/check'
         ]
         
         # Test that login endpoint is in the public list
