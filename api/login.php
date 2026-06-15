@@ -6,9 +6,9 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Credentials: true");
 
-require_once '../config/database.php';
-require_once '../models/user.php';
-require_once '../controllers/userController.php';
+require_once 'config/database.php';
+require_once 'models/user.php';
+require_once 'controllers/userController.php';
 
 $database = new Database();
 $db = $database->getConn();
