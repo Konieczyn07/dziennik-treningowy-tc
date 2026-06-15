@@ -33,11 +33,8 @@ class User {
     }
 
     public function login() {
-        $query = "SELECT id as id,
-                         username as username,
-                         email as email, 
-                         password as password
-                  FROM users 
+        $query = "SELECT TOP 1 id, username, email, password
+                  FROM users
                   WHERE username = ?";
         
         $this->username = htmlspecialchars(strip_tags($this->username));
