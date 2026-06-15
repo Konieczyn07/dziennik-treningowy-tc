@@ -40,16 +40,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests pytest pytest-cov
       
-      - name: Verify test file exists
-        run: |
-          if [ -f "test_api.py" ]; then
-            echo "test_api.py found"
-            cat test_api.py | head -20
-          else
-            echo "test_api.py not found"
-            ls -la
-            exit 1
-          fi
       
       - name: Run API tests with pytest
         run: |
