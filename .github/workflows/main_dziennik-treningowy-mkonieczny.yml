@@ -39,18 +39,41 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests pytest pytest-cov
+      
+      - name: Verify test file exists
+        run: |
+          if [ -f "api/test_api.py" ]; then
+            echo "Test file found at api/test_api.py"
+            ls -la api/
+          else
+            echo "Test file not found, checking alternative locations..."
+            find . -name "test_api.py" -type f
+          fi    
           
       - name: Run API tests with pytest
         run: |
-          # Run tests against local PHP server
-          python -m pytest /api/test_api.py -v --tb=short
-        env:
-          API_BASE_URL: "http://localhost:8000"
+          # Run tests from the api directory
+          if [ -f "api/test_api.py" ]; then
+            cd api
+            python -m pytest test_api.py -v --tb=short
+          elif [ -f "test_api.py" ]; then
+            python -m pytest test_api.py -v --tb=short
+          else
+            echo "No test file found!"
+            exit 1
+          fi
       
-      - name: Run tests with coverage (if supported)
+      - name: Run tests with coverage
         run: |
-          python -m pytest /api/test_api.py -v --cov=. --cov-report=term --cov-report=xml || true
-      
+          if [ -f "api/test_api.py" ]; then
+            cd api
+            python -m pytest test_api.py -v --cov=. --cov-report=term --cov-report=xml
+          elif [ -f "test_api.py" ]; then
+            python -m pytest test_api.py -v --cov=. --cov-report=term --cov-report=xml
+          else
+            echo "No test file found for coverage!"
+            exit 1
+          fi
       - name: Test authentication endpoints
         run: |
           # Quick health check of auth endpoints
