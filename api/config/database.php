@@ -1,9 +1,14 @@
 <?php
 
 class Database {
-	public $username = "rootadmin";
-	public $password = "=fX^anHD~W4a2#.D3ZP1";
+	public $username;
+	public $password;
 	
+	public function __construct() {
+        $this->username = getenv("DATABASE_USERNAME");
+        $this->password = getenv("DATABASE_PASSWORD");
+    }
+
 	public function getConn() {
 		
 
