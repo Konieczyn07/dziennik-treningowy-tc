@@ -1,7 +1,5 @@
-const origin = document.location.origin;
-const root = origin.replace(/\/front$/, '');
-const API_URL = root+"/api/index.php";
-const AUTH_URL = root+"/api/auth";
+const API_URL = "/api/index.php";
+const AUTH_URL = "/api/auth";
 
 const fetchOptions = { credentials: 'include' };
 
