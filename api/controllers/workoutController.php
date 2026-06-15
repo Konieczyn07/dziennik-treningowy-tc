@@ -13,7 +13,7 @@ class WorkoutController{
 	
 	public function getAll(){
 		$this->workout->user_id = $this->getUserId();
-		$return = $this->workout->getAll();
+		$result = $this->workout->getAll();
 		$workouts = [];
 	
         if($result !== false){
