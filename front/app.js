@@ -1,5 +1,5 @@
-const API_URL = getenv("API_URL");
-const AUTH_URL = getenv("AUTH_URL");
+const API_URL = process.env.API_URL;
+const AUTH_URL = process.env.AUTH_URL;
 
 const fetchOptions = { credentials: 'include' };
 
