@@ -38,12 +38,15 @@ class User {
                          email as email, 
                          password as password
                   FROM users 
-                  WHERE username = ?
-                  LIMIT 1";
+                  WHERE username = ?";
         
         $this->username = htmlspecialchars(strip_tags($this->username));
         $params = array($this->username);
         $stmt = sqlsrv_query($this->conn, $query, $params);
+        
+        if ($stmt === false) {
+            return false;
+        }
         $row = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC);
         
         if($row && password_verify($this->password, $row['password'])) {
@@ -57,13 +60,15 @@ class User {
 
     private function userExists() {
         $query = "SELECT id FROM users 
-                  WHERE username = ? OR email = ? 
-                  LIMIT 1";
+                  WHERE username = ? OR email = ?";
         
         $params = array($this->username, $this->email);
         $stmt = sqlsrv_query($this->conn, $query, $params);
-        
-        return $stmt;
+        if ($stmt === false) {
+            return false;
+        }
+        $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+        return !empty($row);
     }
 }
 ?>
