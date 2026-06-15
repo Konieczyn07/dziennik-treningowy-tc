@@ -1,6 +1,6 @@
 const root = document.location.origin;
 const API_URL = root+"/api/index.php";
-const AUTH_URL = root+"/api/auth/";
+const AUTH_URL = root+"/api/auth";
 
 const fetchOptions = { credentials: 'include' };
 
@@ -30,7 +30,7 @@ async function checkAuth() {
 }
 
 async function login(username, password) {
-    const response = await fetch(`${AUTH_URL}/login.php`, {
+    const response = await fetch(`AUTH_URL/login.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -50,21 +50,25 @@ async function login(username, password) {
 }
 
 async function register(username, email, password) {
-    const response = await fetch(`${AUTH_URL}/register.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ username, email, password })
-    });
+    try{
+        const response = await fetch(`${AUTH_URL}/register.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ username, email, password })
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    if (data.success) {
-        showAuthMessage(data.message, 'success');
-        switchAuthTab('login');
-        document.getElementById('login-username').value = username;
-    } else {
-        showAuthMessage(data.message, 'error');
+        if (data.success) {
+            showAuthMessage(data.message, 'success');
+            switchAuthTab('login');
+            document.getElementById('login-username').value = username;
+        } else {
+            showAuthMessage(data.message, 'error');
+        }
+    }catch (error){
+        console.error('Błąd rejestracji: ', error);
     }
 }
 

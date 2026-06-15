@@ -1,14 +1,9 @@
 <?php
 
 class Database {
-	public $username;
-	public $password;
+	public $username = getenv('DATABASE_USERNAME');
+	public $password = getenv('DATABASE_PASSWORD');
 	
-	public function __construct() {
-        $this->username = getenv("DATABASE_USERNAME");
-        $this->password = getenv("DATABASE_PASSWORD");
-    }
-
 	public function getConn() {
 		
 
