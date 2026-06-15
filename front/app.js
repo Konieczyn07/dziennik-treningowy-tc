@@ -1,6 +1,5 @@
-const root = document.location.origin;
-const API_URL = root+"/api/index.php";
-const AUTH_URL = root+"/api/auth";
+const API_URL = "../api/index.php";
+const AUTH_URL = "../api/auth";
 
 const fetchOptions = { credentials: 'include' };
 
@@ -11,7 +10,7 @@ let currentUser = null;
 
 async function checkAuth() {
     try {
-        const response = await fetch(`${AUTH_URL}/check.php`, fetchOptions);
+        const response = await fetch(AUTH_URL, fetchOptions);
         const data = await response.json();
 
         if (data.logged_in) {
@@ -30,7 +29,7 @@ async function checkAuth() {
 }
 
 async function login(username, password) {
-    const response = await fetch(`AUTH_URL/login.php`, {
+    const response = await fetch(AUTH_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
