@@ -1,5 +1,6 @@
-const API_URL = "../api/index.php";
-const AUTH_URL = "../api";
+const root = document.location.origin;
+const AUTH_URL = `${root}/api`;  // Note: no trailing slash
+const API_URL = `${root}/api/index.php`;
 
 const fetchOptions = { credentials: 'include' };
 
