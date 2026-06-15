@@ -1,21 +1,23 @@
 <?php
 
 class Database {
-	public $host = "localhost";
-	public $db_name = "training_journal";
-	public $username = "root";
-	public $password = "";
+	public $username = getenv("DATABASE_USERNAME");
+	public $password = getenv("DATABASE_PASSWORD");
 	public $conn;
 	
 	public function getConn() {
 		$this->conn = null;
 		
-		try{
-			$this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
+
+		try {
+			$this->conn = new PDO("sqlsrv:server = tcp:dzienniktreningowy-sqldb.database.windows.net,1433; Database = dzienniktreningowy-db", $this->username, $this->password);
 			$this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		}catch(PDOException $e){
-			echo "Błąd połączenia: " . $e->getMessage();
 		}
+		catch (PDOException $e) {
+			print("Error connecting to SQL Server.");
+			die(print_r($e));
+		}
+
 		return $this->conn;
 	}
 }
