@@ -50,6 +50,15 @@ class User {
             $this->id = $row['id'];
             $this->username = $row['username'];
             $this->email = $row['email'];
+
+            if(session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            $_SESSION['user_id'] = $this->id;
+            $_SESSION['username'] = $this->username;
+            $_SESSION['email'] = $this->email;
+            $_SESSION['logged_in'] = true;
+            
             return true;
         }
         return false;
