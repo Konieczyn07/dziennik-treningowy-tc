@@ -17,39 +17,33 @@ class User {
             return false;
         }
         
-        $query = "INSERT INTO " . $this->table . "
-                  SET username = :username,
-                      email = :email,
-                      password = :password";
-        
-        $stmt = $this->conn->prepare($query);
+        $query = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
         
         $hashed_password = password_hash($this->password, PASSWORD_DEFAULT);
         
         $this->username = htmlspecialchars(strip_tags($this->username));
         $this->email = htmlspecialchars(strip_tags($this->email));
         
-        $stmt->bindParam(":username", $this->username);
-        $stmt->bindParam(":email", $this->email);
-        $stmt->bindParam(":password", $hashed_password);
-        
-        if($stmt->execute()) {
+        $params = array($this->username, $this->email, $hashed_password);
+        $stmt = sqlsrv_query($this->conn, $query, $params);
+        if($stmt) {
             return true;
         }
         return false;
     }
 
     public function login() {
-        $query = "SELECT id, username, email, password 
-                  FROM " . $this->table . " 
-                  WHERE username = :username OR email = :username 
+        $query = "SELECT id as id,
+                         username as username,
+                         email as email, 
+                         password as password
+                  FROM users 
+                  WHERE username = ? OR email = ? 
                   LIMIT 1";
         
-        $stmt = $this->conn->prepare($query);
         $this->username = htmlspecialchars(strip_tags($this->username));
-        $stmt->bindParam(":username", $this->username);
-        $stmt->execute();
-        
+        $params = array($this->username, $this->username);
+        $stmt = sqlsrv_query($this->conn, $query, $params);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if($row && password_verify($this->password, $row['password'])) {
@@ -62,14 +56,12 @@ class User {
     }
 
     private function userExists() {
-        $query = "SELECT id FROM " . $this->table . " 
-                  WHERE username = :username OR email = :email 
+        $query = "SELECT id FROM users 
+                  WHERE username = ? OR email = ? 
                   LIMIT 1";
         
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":username", $this->username);
-        $stmt->bindParam(":email", $this->email);
-        $stmt->execute();
+        $params = array($this->username, $this->email);
+        $stmt = sqlsrv_query($this->conn, $query, $params);
         
         return $stmt->rowCount() > 0;
     }
