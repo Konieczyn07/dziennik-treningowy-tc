@@ -1,5 +1,5 @@
-const API_URL = "/api/index.php";
-const AUTH_URL = "/api";
+const API_URL = "../api/index.php";
+const AUTH_URL = "../api";
 
 const fetchOptions = { credentials: 'include' };
 
