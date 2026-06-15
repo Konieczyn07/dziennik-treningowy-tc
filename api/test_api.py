@@ -1,4 +1,3 @@
-# api/test_api.py
 import pytest
 import requests
 import json
