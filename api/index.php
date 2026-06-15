@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$public_endpoints = ['/api/auth/login', '/api/auth/register', '/api/auth/check'];
+$public_endpoints = ['/api/login', '/api/register', '/api/check'];
 $request_uri = $_SERVER['REQUEST_URI'];
 
 $is_public = false;
