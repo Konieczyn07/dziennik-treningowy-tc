@@ -44,7 +44,7 @@ class User {
         $this->username = htmlspecialchars(strip_tags($this->username));
         $params = array($this->username, $this->username);
         $stmt = sqlsrv_query($this->conn, $query, $params);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        row = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC);
         
         if($row && password_verify($this->password, $row['password'])) {
             $this->id = $row['id'];
